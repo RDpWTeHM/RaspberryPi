@@ -15,7 +15,7 @@ import bs4
 import os
 import sys
 
-import spiderutils
+##import spiderutils
 
 ###
 ### global variables:
@@ -24,14 +24,15 @@ import spiderutils
 ###
 ### funciton define:
 ###
-def getHTMLText():
-	kv = { 'wd':'IP' }
-	r = requests.get("http://www.baidu.com/s", params=kv )
-	r.encoding = r.apparent_encoding
+def getHTMLText( URL, Params=None, Timeout=30):
+	try:
+		r = requests.get( URL, params=Params, timeout=Timeout )
+		r.raise_for_status()
+		r.encoding = r.apparent_encoding
 
-	return r.text
-#fed function
-
+		return r.text
+	except:
+		return None
 def getIPstr( srcIP ):
 	dst = ''
 	for i in range( len(srcIP) ):
@@ -47,7 +48,7 @@ def getIPstr( srcIP ):
 def main():
 	#htmlData = getHTMLText()
 	kv = { 'wd':'IP' }
-	htmlData = spiderutils.getHTMLText("http://www.baidu.com/s", Params=kv)
+	htmlData = getHTMLText("http://www.baidu.com/s", Params=kv)
 	#print (htmlData)
 	print ("get HTML text OK!")
 
