@@ -19,11 +19,13 @@ $
 
 ```shell
 $
-$ wget https://github.com/RDpWTeHM/RaspberryPi/tree/master/RaspberryPi-script/getWANIP/getWANIP.py
+$ wget https://raw.githubusercontent.com/RDpWTeHM/RaspberryPi/master/RaspberryPi-script/RPiManaged/getWANIP/getWANIP.py
 $ chmod +x getWANIP.py
-$ getWANIP.py 
-## get HTML text OK!
-## 153.35.***.***
+$ 
+$ ## 运行脚本，获得到 WAN IP 并直接打印到标准输出
+$ ./getWANIP.py 
+get HTML text OK!
+153.35.***.***
 $
 ```
 
