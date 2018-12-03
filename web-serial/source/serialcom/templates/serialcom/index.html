@@ -5,6 +5,43 @@
 	<title>SerialCOM</title>
 </head>
 <body>
-	<h1>Hello World</h1>
+	<h1>Serial/COM</h1>
+
+	<form action="" method="POST">
+		<div>
+			<label>Serial/COM:</label>
+			<select>
+				<option>ttyS0</option>
+				<option>ttyAMA0</option>
+				<option>ttyUSB0</option>
+			</select>
+
+			<label>Baud:</label>
+			<input type="text"/>
+			<br/>
+
+			<input type="checkbox" name="advance"
+			       value="advance">Advance
+			<input type="button" name="connect"
+			       id="connect" value="Connect"/>
+		</div>
+	</form>
+	<br/>
+	<form>
+		<div>
+			<select>
+				<option>串口助手模式</option>
+				<option>Console 模式</option>
+			</select>
+		</div>
+		<div>
+			<textarea name="serialinteract"
+			       rows="10" cols="30">
+			</textarea>
+			<br/>
+			<input type="text" name="ser_tx">
+			<input type="button" name="tx_send" value="SEND"/>
+		</div>
+	</form>
 </body>
 </html>
