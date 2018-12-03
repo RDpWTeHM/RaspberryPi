@@ -151,3 +151,63 @@ Choose a Serial device to Open:
 
 
 
+#### 21:06 add `/serialcom/` HTML index
+
+1. 设置 `settings.py` 添加 `serialcom` 这个 “app”
+
+    ```python
+    --- a/web-serial/source/source/settings.py
+    +++ b/web-serial/source/source/settings.py
+    @@ -37,6 +37,8 @@ INSTALLED_APPS = [
+         'django.contrib.sessions',
+         'django.contrib.messages',
+         'django.contrib.staticfiles',
+    +
+    +    'serialcom.apps.SerialcomConfig',
+     ]
+    
+     MIDDLEWARE = [
+    ```
+
+2. 创建 `serialcom/templates/serialcom/` 文件夹，并且添加 `index.html`
+
+    ```html
+    {# source/serialcom/templates/serialcom/index.html #}
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>SerialCOM</title>
+    </head>
+    <body>
+        <h1>Hello World</h1>
+    </body>
+    </html>
+    
+    ```
+
+3. 修改 views.py 使用 index.html response:
+
+    ```python
+    --- a/web-serial/source/serialcom/views.py
+    +++ b/web-serial/source/serialcom/views.py
+    @@ -1,8 +1,9 @@
+     from django.shortcuts import render
+     
+     # Create your views here.
+    -from django.http import HttpResponse
+    +# from django.http import HttpResponse
+     
+     
+     def index(request):
+    -    return HttpResponse("Hello World!")
+    +    return render(request, 'serialcom/index.html',
+    +                  {})
+    
+    ```
+
+启动 django server： `python3 manage.py runserver 0.0.0.0:8756`
+
+浏览器输入路径即可查看：
+
+![basic_index_HTML_template_check_by_browser](res/basic_index_HTML_template_check_by_browser.png)
+

@@ -73,6 +73,7 @@ def main():
 
                 USER_ENTER = ''
                 if doThis == 1:
+                    pass
                 elif doThis == 2:
                     USER_ENTER = ''
                     tmpStr = "\tDo you want to open \"%s\"? Enter Y/n (yes/no) to choose: " % serialName
