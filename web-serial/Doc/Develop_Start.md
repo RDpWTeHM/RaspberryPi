@@ -117,3 +117,37 @@ urlpatterns = [
 +    return HttpResponse("Hello World!")
 ```
 
+
+
+#### 16:16 add basic serial usage
+
+depend on pyserial package. (`pip3 install pyserial`)
+
+create `serialcom/serial` folder.
+
+**Usage (test):**
+
+```shell
+(web-serial) joseph@linux:source$ python ./serialcom/serial/josser.py 
+[Debug: ['/dev/ttyUSB0', 'USB-Serial Controller', 'USB VID:PID=067B:2303 LOCATION=1-1']]
+[Debug: Serial Name = /dev/ttyUSB0]
+
+[Debug: ['/dev/ttyAMA0', 'ttyAMA0', '20201000.serial']]
+[Debug: Serial Name = /dev/ttyAMA0]
+
+==== END for
+
+<class 'set'>
+{'/dev/ttyUSB0', '/dev/ttyAMA0'}
+
+Choose a Serial device to Open:
+	Do you want to open "/dev/ttyUSB0"? Enter Y/n (yes/no) to choose: n
+
+	Do you want to open "/dev/ttyAMA0"? Enter Y/n (yes/no) to choose: n
+
+[Debug: your final choose Serial Name = ""]
+(web-serial) joseph@linux:source$
+```
+
+
+
