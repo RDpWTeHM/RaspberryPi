@@ -320,3 +320,20 @@ def index(request):
 ```
 
 这段 post 代码也并非最终功能，主要是现在手动修改 “False”/“True” 的请求，来观察浏览器上是否能成功修改 button 字样。
+
+
+
+#### 实现真正的 Connect/Disconnect
+
+1. 添加一个 `handler_serial.py` 文件，用于独立的进程打开 serial/COM 通信。
+
+2. django 的 views.py 接收到 浏览器的 request 请求之后，通过 IPC 和 `handler_serial.py` 的进程通信。
+
+3. `serialcom/index.html` 页面的 Connect/Disconnect button 按下之后，使用 Ajax 和 django server 通信。添加了 Connect/Disconnect 两个功能。
+
+> 目前暂时不设 `Serial` 的 timeout -- 阻塞方式。在浏览器 select Serial/COM 要选择正确，可以打开的 serial，否则 `handler_serial.py` 将会 hang 住。
+>
+> Windows 平台亦完全可以使用。可以使用虚拟串口辅助测试。
+
+
+

@@ -16,6 +16,10 @@ function sleep(ms) {
 	  await sleep(3000);
 	  document.getElementById("connect").value = "Connect";
 	}
+	async function waitBack2DisconnectText() {
+	  await sleep(3000);
+	  document.getElementById("connect").value = "Disconnect";
+	}
 
 	function connect_serial(){
 		var xmlhttp;
@@ -28,30 +32,53 @@ function sleep(ms) {
 		    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		}
 		
-		xmlhttp.open("POST", "/serialcom/", true)
-		// xmlhttp.open("POST", "/serialcom/", false); // not async
-
+		xmlhttp.open("POST", "/serialcom/connect/", true)
+		/** not async
+		xmlhttp.open("POST", "/serialcom/", false);
+		 */
 		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-		xmlhttp.send("device_select=" + document.getElementById("device_select").value +
-			         "&baud=" + document.getElementById("baud").value +
-			         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value);
 
+		var conn_status = document.getElementById("connect").value;
+		if (conn_status == "Connect"){
+			xmlhttp.send("connect=" + conn_status +
+						 "&device_select=" + document.getElementById("device_select").value +
+				         "&baud=" + document.getElementById("baud").value +
+				         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value);
+		}else if(conn_status == "Disconnect"){
+			xmlhttp.send("connect=" + conn_status +
+				         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value);
+		}
 		var IsConnected = ""
 		xmlhttp.onreadystatechange=function()
 		{
-			if (xmlhttp.readyState==4 && xmlhttp.status==200)
-			{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
 				IsConnected = xmlhttp.responseText;
+				if (conn_status == "Connect"){
+					if (IsConnected == "True"){
+						document.getElementById("connect").value = "Disconnect";
+					}else if(IsConnected == "False"){
+						document.getElementById("connect").value = "FAIL connect!";
+						waitBack2ConnectText();
+					}
+				}else if(conn_status == "Disconnect"){
+					if (IsConnected == "False"){
+						document.getElementById("connect").value = "Connect";
+					}else if(IsConnected == "True"){
+						document.getElementById("connect").value = "FAIL disconnect!";
+						waitBack2DisconnectText();
+					}
+				}
 			}
 		}
-		// IsConnected = xmlhttp.responseText; // not async
-
+		/** not async
+		IsConnected = xmlhttp.responseText;
 		if (IsConnected == "True"){
 			document.getElementById("connect").value = "disconnect";
 		}else{
 			document.getElementById("connect").value = "FAIL connect!";
 			waitBack2ConnectText();
 		}
+		*/
 	}
 </script>
 </head>
@@ -77,6 +104,7 @@ function sleep(ms) {
 			       value="advance">Advance
 			<input type="button" name="connect" id="connect"
 			       value="Connect" onclick="connect_serial()" />
+			<!--<INPUT type="hidden" name="conn_status" id="conn_status" value="Disconnect"/>-->
 		</div>
 		{% csrf_token %}
 	</form>
