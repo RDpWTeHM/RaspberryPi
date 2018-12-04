@@ -12,7 +12,7 @@ def index(request):
         if __debug__:
             print(request.POST['baud'], file=sys.stderr)
             print(request.POST['device_select'], file=sys.stderr)
-        return HttpResponse("POST OK")
+        return HttpResponse("False")
     elif request.method == 'GET':
         serial = SerialCOM.init()
         return render(request, 'serialcom/index.html',

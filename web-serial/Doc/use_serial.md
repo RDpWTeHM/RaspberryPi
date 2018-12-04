@@ -214,3 +214,109 @@ def index(request):
 
 预期浏览器会变为”POST OK“页面。
 
+#### change "Connect" value of `type="button"`
+
+修改 `type="submit"` 为 `type="button"` ，然后添加 JavaScript function 测试 JavaScript 修改该 button 的 value：
+
+```html
+			<input type="button" name="connect" id="connect"
+			       value="Connect" onclick="connect_serial()" />
+```
+
+JavaScript 修改button value 实现：
+
+```javascript
+[...]
+<head>
+	<title>SerialCOM</title>
+
+<script type="text/javascript">
+	function connect_serial(){
+		var IsConnected = true;
+		if (IsConnected == true){
+			document.getElementById("connect").value = "disconnect";
+		}
+	}
+</script>
+</head>
+```
+
+#### post "Connect" request by Ajax
+
+这里使用 Ajax 来 POST serial 数据以请求 Connect，根据 Response 是否成功（"True"/"False"）来修改 `id = "connect"` button.
+
+```javascript
+<script type="text/javascript">
+/**
+ * utils function:
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+	async function waitBack2ConnectText() {
+	  await sleep(3000);
+	  document.getElementById("connect").value = "Connect";
+	}
+
+	function connect_serial(){
+		var xmlhttp;
+		if (window.XMLHttpRequest){ //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+		    xmlhttp=new XMLHttpRequest();
+		}else{ // IE6, IE5 浏览器执行代码
+		    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		xmlhttp.open("POST", "/serialcom/", true);
+		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		xmlhttp.send("device_select=/dev/ttyUSB0&baud=115200" +
+                     "&csrfmiddlewaretoken=" +
+                     document.getElementsByName("csrfmiddlewaretoken")[0].value);
+
+		var IsConnected = ""
+		xmlhttp.onreadystatechange=function(){
+			if (xmlhttp.readyState==4 && xmlhttp.status==200){
+				IsConnected = xmlhttp.responseText;
+			}
+		}
+
+		if (IsConnected == "True"){
+			document.getElementById("connect").value = "disconnect";
+		}else{
+			document.getElementById("connect").value = "FAIL connect!";
+			waitBack2ConnectText();
+		}
+	}
+</script>
+```
+
+> Reference: [菜鸟教程 - AJAX - 向服务器发送请求请求](http://www.runoob.com/ajax/ajax-xmlhttprequest-send.html)
+
+注意，这里是直接在上面 [change "Connect" value of `type="button"`](#change "Connect" value of `type="button"`) 的
+
+`<input type="button" ... id="connect" ... onclict="connect_serial()" />` 
+
+的 function 中修改。上面的  [change "Connect" value of `type="button"`](#change "Connect" value of `type="button"`) 只是示例如何修改 button 上显示的 value，而非我们最终目标的功能内容。
+
+> 其它注意点：
+>
+> 1. line 24~line 26 为了简单起见，起先做了 hard-code value，后来 POST 的时候，django 需要验证 CSRF，所以又使用了 JavaScript 的字符串 "+" 拼接的简单方式。
+> 2. 正如上述，自己构造 POST 表单 value 的时候，需要带上 CSRF 验证。
+> 3. 使用了 Promise + setTime() 实现的 sleep() 函数，不必深究，模仿使用即可。
+
+
+
+现在使用 Ajax POST 选择的 serial/COM 和 输入的 baud，等待服务器响应 ”True“/”False“，views.py 中处理 POST 代码：
+
+```python
+def index(request):
+    if request.method == 'POST':
+        if __debug__:
+            print(request.POST['baud'], file=sys.stderr)
+            print(request.POST['device_select'], file=sys.stderr)
+        return HttpResponse("False")
+        # return HttpResponse("True")
+    elif request.method == 'GET':[...]
+```
+
+这段 post 代码也并非最终功能，主要是现在手动修改 “False”/“True” 的请求，来观察浏览器上是否能成功修改 button 字样。

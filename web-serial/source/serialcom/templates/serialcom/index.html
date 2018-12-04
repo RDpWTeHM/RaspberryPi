@@ -3,6 +3,57 @@
 <html>
 <head>
 	<title>SerialCOM</title>
+
+<script type="text/javascript">
+/**
+ * utils function:
+ */
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+	async function waitBack2ConnectText() {
+	  await sleep(3000);
+	  document.getElementById("connect").value = "Connect";
+	}
+
+	function connect_serial(){
+		var xmlhttp;
+		if (window.XMLHttpRequest)
+		{
+		    //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+		    xmlhttp=new XMLHttpRequest();
+		}else{
+		    // IE6, IE5 浏览器执行代码
+		    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+		}
+		
+		xmlhttp.open("POST", "/serialcom/", true)
+		// xmlhttp.open("POST", "/serialcom/", false); // not async
+
+		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+		xmlhttp.send("device_select=" + document.getElementById("device_select").value +
+			         "&baud=" + document.getElementById("baud").value +
+			         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value);
+
+		var IsConnected = ""
+		xmlhttp.onreadystatechange=function()
+		{
+			if (xmlhttp.readyState==4 && xmlhttp.status==200)
+			{
+				IsConnected = xmlhttp.responseText;
+			}
+		}
+		// IsConnected = xmlhttp.responseText; // not async
+
+		if (IsConnected == "True"){
+			document.getElementById("connect").value = "disconnect";
+		}else{
+			document.getElementById("connect").value = "FAIL connect!";
+			waitBack2ConnectText();
+		}
+	}
+</script>
 </head>
 <body>
 	<h1>Serial/COM</h1>
@@ -24,8 +75,8 @@
 
 			<input type="checkbox" name="advance"
 			       value="advance">Advance
-			<input type="submit" name="connect"
-			       id="connect" value="Connect"/>
+			<input type="button" name="connect" id="connect"
+			       value="Connect" onclick="connect_serial()" />
 		</div>
 		{% csrf_token %}
 	</form>
