@@ -10,7 +10,7 @@
 	<form action="" method="POST">
 		<div>
 			<label>Serial/COM:</label>
-			<select>
+			<select name="device_select" id="device_select">
 				<option>Select one Device</option>
 			{% for device in serial.devices	%}
 				<option>{{ device }}</option>
@@ -18,14 +18,16 @@
 			</select>
 
 			<label>Baud:</label>
-			<input type="text"/>
+			<input type="text" name="baud" id="baud"
+			       value="9600"/>
 			<br/>
 
 			<input type="checkbox" name="advance"
 			       value="advance">Advance
-			<input type="button" name="connect"
+			<input type="submit" name="connect"
 			       id="connect" value="Connect"/>
 		</div>
+		{% csrf_token %}
 	</form>
 	<br/>
 	<form>
@@ -43,6 +45,8 @@
 			<input type="text" name="ser_tx">
 			<input type="button" name="tx_send" value="SEND"/>
 		</div>
+
+		{% csrf_token %}
 	</form>
 </body>
 </html>

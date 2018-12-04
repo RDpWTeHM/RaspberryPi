@@ -143,6 +143,7 @@ class SerialCOM():
 
     @classmethod
     def init(cls):
+        # cls.devices = ["ttyS0", "ttyAMA0", "ttyUSB0", ]
         portList = list(serial.tools.list_ports.comports())
         serial_name_set = set()
         for i in range(len(portList)):
@@ -155,4 +156,61 @@ class SerialCOM():
 ```
 
 这样刷新浏览器获 select 中得到的是真实的设备信息。
+
+
+
+### Dec/04
+
+#### handler POST
+
+为了使浏览器载入 HTML 后 POST 带有数据，需要在 form 中指定要 POST 的字段的 id/name:
+
+```html
+[...]
+	<h1>Serial/COM</h1>
+
+	<form action="" method="POST">
+		<div>
+			<label>Serial/COM:</label>
+			<select name="device_select" id="device_select">
+				<option>Select one Device</option>
+			{% for device in serial.devices	%}
+				<option>{{ device }}</option>
+			{% endfor	%}
+			</select>
+
+			<label>Baud:</label>
+			<input type="text" name="baud" id="baud"
+			       value="9600"/>
+			<br/>
+
+			<input type="checkbox" name="advance"
+			       value="advance">Advance
+			<input type="submit" name="connect"
+			       id="connect" value="Connect"/>
+		</div>
+		{% csrf_token %}
+	</form>
+```
+
+django server 接收处理 POST：
+
+```python 
+def index(request):
+    if request.method == 'POST':
+        if __debug__:
+            print(request.POST['baud'], file=sys.stderr)
+            print(request.POST['device_select'], file=sys.stderr)
+        return HttpResponse("POST OK")
+    elif request.method == 'GET':
+        serial = SerialCOM.init()
+        return render(request, 'serialcom/index.html',
+                      {'serial': serial}, )
+    else:
+        pass  # not support.
+```
+
+可以点击浏览器的 ”Connect“ 按钮，看 server 的 terminal 上是否有 POST 过来的 debug 数据输出。
+
+预期浏览器会变为”POST OK“页面。
 
