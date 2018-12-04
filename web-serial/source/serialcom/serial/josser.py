@@ -45,6 +45,25 @@ class SerialCOM():
     def __init__(self):
         pass
 
+    @classmethod
+    def init(cls):
+        portList = list(serial.tools.list_ports.comports())
+        serial_name_set = set()
+        for i in range(len(portList)):
+            portList_coder = list(portList[i])
+            if __debug__:
+                print("[Debug: " + str(portList_coder) + ']', file=sys.stderr)
+                print("[Debug: Serial Name = " + portList_coder[0] + ']', file=sys.stderr)
+
+            serial_name_set.add(portList_coder[0])
+        if __debug__:
+            print(type(serial_name_set), file=sys.stderr)
+            print(serial_name_set, file=sys.stderr)
+
+        cls.devices = [_serialname for _serialname in serial_name_set]
+
+        return cls()
+
 
 def main():
     argc = len(sys.argv)

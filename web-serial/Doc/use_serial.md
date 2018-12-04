@@ -39,7 +39,7 @@ README
 
 ![basic_web_serialcom-UI](res/basic_web_serialcom-UI.png)
 
-##### Serial/COM select
+##### Template Serial/COM select
 
 ```html
 [...]
@@ -112,4 +112,47 @@ class SerialCOM():
 ```
 
 暂时不需要太多内容。
+
+##### Serial/COM select by read device
+
+使用 `@classmethod` 直接调用类方法来返回类本身；在类方法中，读取 device 信息。
+
+使用：
+
+```python
+--- a/web-serial/source/serialcom/views.py
++++ b/web-serial/source/serialcom/views.py
+@@ -6,7 +6,6 @@ from .serial.josser import SerialCOM
+ 
+ 
+ def index(request):
+-    serial = SerialCOM()
+-    serial.devices = ["ttyS0", "ttyAMA0", "ttyUSB0", ]
++    serial = SerialCOM.init()
+     return render(request, 'serialcom/index.html',
+                   {'serial': serial}, )
+
+```
+
+使用 `@classmethod` 实现的 init 函数：
+
+```python
+class SerialCOM():
+    devices = []
+    [...]
+
+    @classmethod
+    def init(cls):
+        portList = list(serial.tools.list_ports.comports())
+        serial_name_set = set()
+        for i in range(len(portList)):
+            portList_coder = list(portList[i])
+            serial_name_set.add(portList_coder[0])
+
+        cls.devices = [_serialname for _serialname in serial_name_set]
+
+        return cls()
+```
+
+这样刷新浏览器获 select 中得到的是真实的设备信息。
 
