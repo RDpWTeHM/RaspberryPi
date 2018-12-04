@@ -11,9 +11,10 @@
 		<div>
 			<label>Serial/COM:</label>
 			<select>
-				<option>ttyS0</option>
-				<option>ttyAMA0</option>
-				<option>ttyUSB0</option>
+				<option>Select one Device</option>
+			{% for device in serial.devices	%}
+				<option>{{ device }}</option>
+			{% endfor	%}
 			</select>
 
 			<label>Baud:</label>

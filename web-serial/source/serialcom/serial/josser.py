@@ -38,9 +38,12 @@ import sys
 #
 doThis = 2
 
-#
-# function:
-#
+
+class SerialCOM():
+    devices = []
+
+    def __init__(self):
+        pass
 
 
 def main():
