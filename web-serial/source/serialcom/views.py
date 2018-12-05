@@ -43,3 +43,25 @@ def connect(request):
         resp_result = str(recv)  # translate "True"/"False" directly
 
         return HttpResponse(resp_result)
+
+
+def receive(request):
+    if request.method == "GET":
+        if request.GET["read"] == "read":
+            msg = {
+                "type": "recv",
+                "length": int(request.GET["length"]),
+            }
+        else:
+            print("request with wrong data", file=sys.stderr)
+
+        if __debug__:
+            print(msg, file=sys.stderr)
+
+        client_conn = Client(("127.0.0.1", 27446), authkey=b'serialcom')
+        client_conn.send(msg)
+
+        recv = client_conn.recv()
+        client_conn.close()
+
+        return HttpResponse(recv)

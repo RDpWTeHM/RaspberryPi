@@ -58,7 +58,10 @@ def handler_client(conn):
             elif msg["type"] == "send":
                 conn.send(ser.write(msg["message"].encode()))
             elif msg["type"] == "recv":
-                conn.send(ser.read(msg["length"]).decode())
+                if ser.isOpen() is True:
+                    conn.send(ser.read(msg["length"]).decode())
+                else:
+                    conn.send("Not connect serial\r\n")
             else:
                 conn.send("Unknow Message Type")
         except EOFError:

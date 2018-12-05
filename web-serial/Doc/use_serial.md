@@ -337,3 +337,108 @@ def index(request):
 
 
 
+### Dec/05 接收串口及显示
+
+#### 20:15 Ajax 请求串口数据并显示
+
+创建一个 `/serialcom/recive/` 用于请求接收数据:
+
+```python
+urlpatterns = [
+    path("", views.index, name="index"),
+
+    path("connect/", views.connect, name="connect"),
+    path("recive/", views.recive, name="recive"),
+]
+```
+
+views.py 中处理该请求暂时返回假的数据用于测试前端功能：
+
+```python
+def recive(request):
+    if request.method == "GET":
+        if request.GET["read"] == "read":
+            msg = {
+                "type": "recv",
+                "length": int(request.GET["length"]),
+            }
+        else:
+            print("request with wrong data", file=sys.stderr)
+
+        if __debug__:
+            print(msg, file=sys.stderr)
+
+        recv = "*" * (int(request.GET["length"]) - 2) + "\r\n"
+        return HttpResponse(recv)
+```
+
+前端添加一个 button，点击即发送请求接收串口数据：
+
+```javascript
+			<textarea name="serial_recv" id="serial_recv"
+			       rows="10" cols="30">
+			</textarea>
+			<br/>
+			<input type="button" name="click_to_recv" id="click_to_recv"
+			       value="Click to Recive" onclick="click2recv()" />
+			<script>
+				function click2recv(){
+					var xmlhttp_recv;
+					if (window.XMLHttpRequest){ //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+					    xmlhttp_recv=new XMLHttpRequest();
+					}else{ // IE6, IE5 浏览器执行代码
+					    xmlhttp_recv=new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					
+					xmlhttp_recv.open("GET",
+						              "/serialcom/recive/?read=read&length=" +
+						              Math.trunc(Math.random()*10), true);
+					xmlhttp_recv.send();
+
+					var str_recv = ""
+					xmlhttp_recv.onreadystatechange=function()
+					{
+						if (xmlhttp_recv.readyState==4 && xmlhttp_recv.status==200){
+							str_recv = xmlhttp_recv.responseText;
+							document.getElementById("serial_recv").value += str_recv;
+						}
+					}
+				}
+			</script>
+```
+
+
+
+#### 20:38 接收真实的串口数据
+
+```python
+def recive(request):
+    if request.method == "GET":
+        if request.GET["read"] == "read":
+            msg = {"type": "recv",
+                   "length": int(request.GET["length"]), }
+        else:
+            print("request with wrong data", file=sys.stderr)
+
+        if __debug__:
+            print(msg, file=sys.stderr)
+
+        client_conn = Client(("127.0.0.1", 27446), authkey=b'serialcom')
+        client_conn.send(msg)
+
+        recv = client_conn.recv()
+        client_conn.close()
+
+        return HttpResponse(recv)
+```
+
+在链接上串口之后，点击页面上的 "Click to Receive" 来接收数据。
+
+此时会在启动 django 的终端上打印如 `{'length': 8, 'type': 'recv'}` ; 根据长度在测试链接的串口发送任意想要发送的该长度的字符测试浏览器显示。
+
+> 开发测试阶段 views.py 将接收到的 request 数据做了打印输出来调试。
+>
+> 前端代码中可以看出，每次请求接收的字符长度是随机的。写成固定长度当然也可以。
+
+
+

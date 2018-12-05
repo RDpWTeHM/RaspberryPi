@@ -32,10 +32,7 @@ function sleep(ms) {
 		    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
 		}
 		
-		xmlhttp.open("POST", "/serialcom/connect/", true)
-		/** not async
-		xmlhttp.open("POST", "/serialcom/", false);
-		 */
+		xmlhttp.open("POST", "/serialcom/connect/", true);
 		xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
 
 		var conn_status = document.getElementById("connect").value;
@@ -70,15 +67,6 @@ function sleep(ms) {
 				}
 			}
 		}
-		/** not async
-		IsConnected = xmlhttp.responseText;
-		if (IsConnected == "True"){
-			document.getElementById("connect").value = "disconnect";
-		}else{
-			document.getElementById("connect").value = "FAIL connect!";
-			waitBack2ConnectText();
-		}
-		*/
 	}
 </script>
 </head>
@@ -117,9 +105,43 @@ function sleep(ms) {
 			</select>
 		</div>
 		<div>
-			<textarea name="serialinteract"
+			<textarea name="serial_recv" id="serial_recv"
 			       rows="10" cols="30">
 			</textarea>
+			<br/>
+			<input type="button" name="click_to_recv" id="click_to_recv"
+			       value="Click to Receive" onclick="click2recv()" />
+			<script>
+				console.log("test could running??? " + Math.trunc(Math.random()*10));
+				async function waitTest() {
+	  				await sleep(1000);
+	  				document.getElementById("serial_recv").value += "heheda\r\n";
+				}
+				waitTest();
+
+				function click2recv(){
+					var xmlhttp_recv;
+					if (window.XMLHttpRequest){ //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+					    xmlhttp_recv=new XMLHttpRequest();
+					}else{ // IE6, IE5 浏览器执行代码
+					    xmlhttp_recv=new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					
+					xmlhttp_recv.open("GET",
+						              "/serialcom/receive/?read=read&length=" +
+						              Math.trunc(Math.random()*10), true);
+					xmlhttp_recv.send();
+
+					var str_recv = ""
+					xmlhttp_recv.onreadystatechange=function()
+					{
+						if (xmlhttp_recv.readyState==4 && xmlhttp_recv.status==200){
+							str_recv = xmlhttp_recv.responseText;
+							document.getElementById("serial_recv").value += str_recv;
+						}
+					}
+				}
+			</script>
 			<br/>
 			<input type="text" name="ser_tx">
 			<input type="button" name="tx_send" value="SEND"/>
