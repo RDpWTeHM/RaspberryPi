@@ -65,3 +65,25 @@ def receive(request):
         client_conn.close()
 
         return HttpResponse(recv)
+
+
+def send(request):
+    if request.method == "POST":
+        if request.POST["send"] == "send":
+            msg = {
+                "type": "send",
+                "message": request.POST["data"],
+            }
+        else:
+            print("request with wrong data", file=sys.stderr)
+
+        if __debug__:
+            print(msg, file=sys.stderr)
+
+        client_conn = Client(("127.0.0.1", 27446), authkey=b'serialcom')
+        client_conn.send(msg)
+
+        recv = client_conn.recv()
+        client_conn.close()
+
+        return HttpResponse(recv)

@@ -7,5 +7,6 @@ urlpatterns = [
 
     path("connect/", views.connect, name="connect"),
     path("receive/", views.receive, name="receive"),
+    path("send/", views.send, name="send"),
 
 ]

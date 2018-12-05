@@ -20,7 +20,7 @@ from serial import Serial
 from multiprocessing.connection import Listener
 
 
-ser = None  # only support handler one connection for now.
+ser = Serial()  # only support handler one connection for now.
 
 
 class JOSEPH(Serial):
@@ -56,7 +56,10 @@ def handler_client(conn):
                 # "send", "recv" functional not achieve and test yet!
                 #
             elif msg["type"] == "send":
-                conn.send(ser.write(msg["message"].encode()))
+                if ser.isOpen() is True:
+                    conn.send(ser.write(msg["message"].encode()))
+                else:
+                    conn.send(0)
             elif msg["type"] == "recv":
                 if ser.isOpen() is True:
                     conn.send(ser.read(msg["length"]).decode())

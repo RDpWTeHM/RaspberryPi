@@ -97,7 +97,8 @@ function sleep(ms) {
 		{% csrf_token %}
 	</form>
 	<br/>
-	<form>
+	<form action="" method="POST">
+		{% csrf_token %}
 		<div>
 			<select>
 				<option>串口助手模式</option>
@@ -115,7 +116,7 @@ function sleep(ms) {
 				console.log("test could running??? " + Math.trunc(Math.random()*10));
 				async function waitTest() {
 	  				await sleep(1000);
-	  				document.getElementById("serial_recv").value += "heheda\r\n";
+	  				// document.getElementById("serial_recv").value += "heheda\r\n";
 				}
 				waitTest();
 
@@ -143,11 +144,39 @@ function sleep(ms) {
 				}
 			</script>
 			<br/>
-			<input type="text" name="ser_tx">
-			<input type="button" name="tx_send" value="SEND"/>
-		</div>
+			<input type="text" name="ser_tx" id="ser_tx">
+			<input type="button" name="tx_send" value="SEND" onclick="click2send()"/>
+			<script>
+				// async function waitTest() {
+				// 	await sleep(1000);
+				// 	document.getElementById("serial_recv").value += "heheda\r\n";
+				// }
+				// waitTest();
 
-		{% csrf_token %}
+				function click2send(){
+					var xmlhttp_send;
+					if (window.XMLHttpRequest){ //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
+					    xmlhttp_send=new XMLHttpRequest();
+					}else{ // IE6, IE5 浏览器执行代码
+					    xmlhttp_send=new ActiveXObject("Microsoft.XMLHTTP");
+					}
+					
+					xmlhttp_send.open("POST", "/serialcom/send/", true);
+					xmlhttp_send.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+					xmlhttp_send.send("send=" + "send" + "&data=" + document.getElementById("ser_tx").value +
+						         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[1].value);
+
+					var succ_send = 0
+					xmlhttp_send.onreadystatechange=function()
+					{
+						if (xmlhttp_send.readyState==4 && xmlhttp_send.status==200){
+							succ_send = parseInt(xmlhttp_send.responseText);
+							alert("send " + succ_send + "byte(s) success");
+						}
+					}
+				}
+			</script>
+		</div>
 	</form>
 </body>
 </html>
