@@ -29,11 +29,11 @@ class JOSEPH(Serial):
     def connect_by_djangoIPC(cls, _parms):
         _dev = _parms["device"]
         _baud = _parms["baud"]
-        _to = _parms.get("timeout", None)
+        _tout = _parms.get("timeout", None)
         if __debug__:
             print("_dev: {}; _baud: {}; _to: {}".format(
-                _dev, _baud, _to), file=sys.stderr)
-        return Serial(_dev, _baud, timeout=_to)
+                _dev, _baud, _tout), file=sys.stderr)
+        return Serial(_dev, _baud, timeout=_tout)
         # return None
 
 

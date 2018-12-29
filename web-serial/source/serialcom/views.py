@@ -2,6 +2,7 @@ from django.shortcuts import render
 
 # Create your views here.
 from django.http import HttpResponse
+from django.http import Http404
 import sys
 
 from .serial.josser import SerialCOM
@@ -11,7 +12,7 @@ from multiprocessing.connection import Client
 
 def index(request):
     if request.method == 'POST':
-        return HttpResponse("POST to \"/serialcom/connect/\"")
+        raise Http404("POST to \"/serialcom/connect/\"")
     elif request.method == 'GET':
         serial = SerialCOM.init()
         return render(request, 'serialcom/index.html',
@@ -30,6 +31,7 @@ def connect(request):
                    "device": request.POST['device_select'],
                    "baud": int(request.POST['baud']),
                    }
+            msg["timeout"] = 2
         elif request.POST["connect"] == "Disconnect":
             msg = {"type": "disconnect"}
 

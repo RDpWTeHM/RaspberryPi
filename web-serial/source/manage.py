@@ -106,6 +106,4 @@ if __name__ == '__main__':
         t = threading.Thread(target=delay_enable_browser, args=(sys.argv, ))
         t.start(); del t;
 
-        print("[Debug]: change code for test", file=sys.stderr)
-
     execute_from_command_line(sys.argv)

@@ -26,6 +26,10 @@ D:\RaspberryPi\web-serial > mkvirtualenv web-serial
 ...
 ## it will be try to enable a browser
 ## to access "localhost:8000/serialcom/" automatically.
+#### open another cmd-window ####
+(web-serial) D:\...\source > python handler_serial.py
+Listener on ('', 27446) with b'serialcom'
+
 ```
 
 
