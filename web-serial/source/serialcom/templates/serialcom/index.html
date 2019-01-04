@@ -43,6 +43,7 @@ function sleep(ms) {
 				         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value);
 		}else if(conn_status == "Disconnect"){
 			xmlhttp.send("connect=" + conn_status +
+						 "&device_select=" + document.getElementById("device_select").value +
 				         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[0].value);
 		}
 		var IsConnected = ""
@@ -114,7 +115,7 @@ function sleep(ms) {
 			       rows="10" cols="30">
 			</textarea>
 			<br/>
-			<input type="button" name="click_to_recv" id="click_to_recv"
+			<input type="hidden" name="click_to_recv" id="click_to_recv"
 			       value="Click to Receive" onclick="click2recv()" />
 			<script>
 				/**
@@ -144,8 +145,9 @@ function sleep(ms) {
 					}
 					
 					xmlhttp_recv.open("GET",
-						              "/serialcom/receive/?read=read&length=" +
-						              16, true);
+						              "/serialcom/receive/?device=" +
+						              document.getElementById("device_select").value,
+						              true);
 					xmlhttp_recv.send();
 
 					var str_recv = ""
@@ -159,29 +161,6 @@ function sleep(ms) {
 					}
 				}
 
-
-				function click2recv(){
-					var xmlhttp_recv;
-					if (window.XMLHttpRequest){ //  IE7+, Firefox, Chrome, Opera, Safari 浏览器执行代码
-					    xmlhttp_recv=new XMLHttpRequest();
-					}else{ // IE6, IE5 浏览器执行代码
-					    xmlhttp_recv=new ActiveXObject("Microsoft.XMLHTTP");
-					}
-					
-					xmlhttp_recv.open("GET",
-						              "/serialcom/receive/?read=read&length=" +
-						              Math.trunc(Math.random()*10), true);
-					xmlhttp_recv.send();
-
-					var str_recv = ""
-					xmlhttp_recv.onreadystatechange=function()
-					{
-						if (xmlhttp_recv.readyState==4 && xmlhttp_recv.status==200){
-							str_recv = xmlhttp_recv.responseText;
-							document.getElementById("serial_recv").value += str_recv;
-						}
-					}
-				}
 			</script>
 			<br/>
 			<input type="text" name="ser_tx" id="ser_tx">

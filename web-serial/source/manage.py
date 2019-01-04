@@ -4,46 +4,20 @@ import sys
 
 import threading
 import traceback
+#
+# package path
+#
+try:
+    _cwd = os.getcwd()
+    _proj_abs_path = _cwd[0:_cwd.find("web-serial")]
+    _package_path = os.path.join(_proj_abs_path, "source")
+    if _package_path not in sys.path:
+        sys.path.append(_package_path)
 
-"""
-def Is_child_processing():
-    from multiprocessing.connection import Listener
-    from multiprocessing.connection import Client
-    from queue import Queue
-
-    q = Queue()
-
-    def handle_child_ask():
-        nonlocal q
-        try:
-            listener = Listener(("", 62771), authkey=b'IsChildProcessing')
-            q.put("perant")
-        except Exception:  # port be used by parent
-            # traceback.print_exc()
-            q.put("child")
-            return  # child don't listen
-        if True:
-            while True:
-                serv = listener.accept()  # just bind the port.
-        else:  # those solution not be used
-            while True:
-                try:
-                    serv = listener.accept()  # block
-                    try:
-                        while True:  # communicate
-                            msg = serv.recv()  # block
-                            serv.send(msg)  # echo first.
-                    except EOFError:  # client .close
-                        pass
-                except Exception:
-                    traceback.print_exc()
-
-    t = threading.Thread(target=handle_child_ask)
-    t.setDaemon(True)
-    t.start(); del t;
-    ret = True if q.get() == "child" else False
-    return ret
-"""
+    # from serialpublisher import HwSubject
+except Exception:
+    traceback.print_exc()  # -[o] fix later by using argv
+    sys.exit(1)
 
 
 def Is_child_processing():
@@ -69,6 +43,7 @@ def Is_child_processing():
     t.setDaemon(True)
     t.start(); del t;
     return q.get()
+
 
 #
 # open browser(like $ jupyter notebook)
@@ -105,5 +80,14 @@ if __name__ == '__main__':
     if Is_child_processing():
         t = threading.Thread(target=delay_enable_browser, args=(sys.argv, ))
         t.start(); del t;
+
+        #
+        # web serial Top subject init
+        #
+        from serialcom.serial import designpattern as dsigpt
+        obj = dsigpt.HwSubject()
+        print("[Test] HwSubject().isPlug('COM20'): {!r}".format(obj.isPlug('COM20')),
+              file=sys.stderr)
+        obj.run()
 
     execute_from_command_line(sys.argv)
