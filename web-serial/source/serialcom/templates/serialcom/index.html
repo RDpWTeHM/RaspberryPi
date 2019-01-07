@@ -102,7 +102,7 @@ function sleep(ms) {
 		{% csrf_token %}
 	</form>
 	<br/>
-	<form action="" method="POST">
+	<form action="" method="POST" onkeydown="if(event.keyCode==13){return false;}">
 		{% csrf_token %}
 		<div>
 			<select>
@@ -176,8 +176,10 @@ function sleep(ms) {
 					
 					xmlhttp_send.open("POST", "/serialcom/send/", true);
 					xmlhttp_send.setRequestHeader("Content-type","application/x-www-form-urlencoded");
-					xmlhttp_send.send("send=" + "send" + "&data=" + document.getElementById("ser_tx").value +
-						         "&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[1].value);
+					xmlhttp_send.send(
+						"send=" + "send" + "&device=" + document.getElementById("device_select").value +
+						"&data=" + document.getElementById("ser_tx").value +
+						"&csrfmiddlewaretoken=" + document.getElementsByName("csrfmiddlewaretoken")[1].value);
 
 					var succ_send = 0
 					xmlhttp_send.onreadystatechange=function()

@@ -152,16 +152,6 @@ def connect(request):
                 ret = False  # not connection state, means equl to disconnection
             resp_result = str(ret)
 
-        elif False:
-            client_conn = Client(("127.0.0.1", 27446), authkey=b'serialcom')
-            client_conn.send(msg)
-
-            recv = client_conn.recv()
-            client_conn.close()
-            if __debug__:
-                print("recv handler_serial.py: ", recv, file=sys.stderr)
-            resp_result = str(recv)  # translate "True"/"False" directly
-
         return HttpResponse(resp_result)
     elif request.method == 'GET':
         # -[o] long connection, register device state status
@@ -169,26 +159,6 @@ def connect(request):
 
 
 def receive(request):
-    # if request.method == "GET":
-    if False:
-        if request.GET["read"] == "read":
-            msg = {
-                "type": "recv",
-                "length": int(request.GET["length"]),
-            }
-        else:
-            print("request with wrong data", file=sys.stderr)
-
-        if __debug__:
-            print(msg, file=sys.stderr)
-
-        client_conn = Client(("127.0.0.1", 27446), authkey=b'serialcom')
-        client_conn.send(msg)
-
-        recv = client_conn.recv()
-        client_conn.close()
-
-        return HttpResponse(recv)
     if True:  # design pattern version:
         if request.method == 'GET':
             try:
@@ -196,8 +166,8 @@ def receive(request):
                 device_name = request.GET["device"]
                 recv_task = Receive(device_name)
             except (IndexError, SerialDoseNotConnectionError) as err:
-                print("views.py> receive()> ", err,
-                      file=sys.stderr)
+                # print("views.py> receive()> ", err,
+                #       file=sys.stderr)
                 raise Http404(err)
             except Exception:
                 import traceback; traceback.print_exc();
@@ -215,21 +185,30 @@ def receive(request):
 
 def send(request):
     if request.method == "POST":
-        if request.POST["send"] == "send":
+        try:
             msg = {
-                "type": "send",
+                "type": request.POST["send"],
+                "device": request.POST['device'],
                 "message": request.POST["data"],
             }
-        else:
+        except IndexError:
             print("request with wrong data", file=sys.stderr)
+            raise Http404("request with wrong data")
 
         if __debug__:
             print(msg, file=sys.stderr)
 
-        client_conn = Client(("127.0.0.1", 27446), authkey=b'serialcom')
-        client_conn.send(msg)
+        try:
+            # conn.send(ser.write(msg["message"].encode()))
+            deviceState = SerialDevice.getInstance(msg['device'])
+            if not isinstance(deviceState.getState(), ConnectionState):
+                raise SerialDoseNotConnectionError("Not connected!")
+            else:
+                _ser = deviceState.serial_handler
 
-        recv = client_conn.recv()
-        client_conn.close()
-
-        return HttpResponse(recv)
+                return HttpResponse(_ser.write(msg['message'].encode()))
+        except SerialDoseNotConnectionError:
+            raise Http404(0)
+        except Exception:
+            import traceback; traceback.print_exc();
+            raise
